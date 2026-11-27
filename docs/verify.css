@@ -118,4 +118,8 @@
   .audit-table td::before { content: attr(data-label) " "; font: 11px/1.3 system-ui, sans-serif; color: var(--audit-quiet); }
   .r-shell { flex-wrap: wrap; }
 }
-@media(max-width: 335px) { .audit-nav .brand-separator, .audit-nav .brand > span:last-child { display: none; } }
+@media(max-width: 360px) {
+  .audit-nav .brand-separator, .audit-nav .brand strong { display: none; }
+  .audit-nav .brand > span:last-child { display: inline; }
+  .day-metrics dt { min-height: 2.6em; }
+}
