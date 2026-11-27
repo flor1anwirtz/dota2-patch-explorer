@@ -1,0 +1,15 @@
+# Run from the project root: Rscript run_analysis.R
+if (getRversion() < "4.1.0") stop("R >= 4.1.0 is required.")
+packages <- c("ggplot2", "dplyr", "readr", "broom")
+missing <- packages[!vapply(packages, requireNamespace, logical(1), quietly = TRUE)]
+if (length(missing)) stop("Install missing packages: ", paste(missing, collapse = ", "))
+if (packageVersion("dplyr") < "1.1.0") stop("dplyr >= 1.1.0 is required.")
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(broom)
+source("scripts/02_clean_data.R", local = TRUE)
+source("scripts/03_statistical_analysis.R", local = TRUE)
+source("scripts/04_visualization.R", local = TRUE)
+writeLines(capture.output(sessionInfo()), file.path(output_dir, "session_info.txt"))
+message("Finished. New tables and figures: ", output_dir)

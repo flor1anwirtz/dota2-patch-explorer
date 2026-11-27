@@ -1,0 +1,26 @@
+# Local data and generated outputs
+data/raw/*
+!data/raw/.gitkeep
+data/downloads/
+data/processed/
+results/generated/
+opendota_ranked_*/
+*.csv.zip
+7.41dota2.csv
+7.42dota2.csv
+
+# Secrets and local environment
+.env
+.env.*
+.Renviron
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+.ipynb_checkpoints/
+Rplots.pdf
+.DS_Store
+Thumbs.db
+report.html
+report_files/
+!docs/report.html

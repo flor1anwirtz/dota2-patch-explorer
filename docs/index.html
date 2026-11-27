@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0e151e">
+  <meta name="description" content="Explore Radiant and Dire win rates across Dota 2 patches, ranked match lengths, and medal groups.">
+  <title>Dota 2 Patch Explorer</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="data.js" defer></script>
+  <script src="standardize.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a href="#comparison" class="skip-link">Skip to comparison</a>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a href="#top" class="brand" aria-label="Dota 2 Patch Explorer home"><i class="brand-mark" aria-hidden="true"></i><strong>Dota 2</strong><span class="brand-separator" aria-hidden="true"></span><span>Patch Explorer</span></a>
+      <nav aria-label="Sections"><a href="#comparison">Comparison</a><a href="#breakdown">Breakdown</a><a href="#methods">Methods</a></nav>
+    </div>
+  </header>
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-inner"><h1>Radiant <span>vs.</span> Dire</h1><p>Compare side win rates across ranked Dota 2 patches, match lengths and rank groups.</p></div>
+    </section>
+    <div class="container content">
+      <div id="error" role="alert" hidden></div>
+      <noscript><p class="error-box">Enable JavaScript to explore the patch data.</p></noscript>
+      <div id="dashboard" hidden>
+        <section id="comparison" aria-labelledby="comparison-title">
+          <div class="section-heading"><h2 id="comparison-title">Patch comparison</h2><button id="reset" class="text-button" type="button" disabled>Clear filters</button></div>
+          <div class="controls">
+            <div class="patch-controls">
+              <label for="first">First patch<select id="first"></select></label>
+              <button type="button" id="swap" class="swap" title="Swap patches" aria-label="Swap patches"><span aria-hidden="true">⇄</span></button>
+              <label for="second">Second patch<select id="second"></select></label>
+            </div>
+            <div class="filter-controls">
+              <label for="duration">Final duration<select id="duration"><option value="">All durations</option><option value="20-30">20 to &lt;30 min</option><option value="30-40">30 to &lt;40 min</option><option value="40+">40+ min</option></select></label>
+              <label for="rank">Rank group<select id="rank"><option value="">All ranks</option><option value="low">Herald to Crusader</option><option value="mid">Archon to Ancient</option><option value="high">Divine / Immortal</option></select></label>
+            </div>
+          </div>
+          <div class="summary-layout">
+            <article class="card share-card" aria-labelledby="share-title">
+              <div class="card-heading"><h3 id="share-title">Win share</h3><div class="team-legend"><span><i class="swatch radiant"></i>Radiant</span><span><i class="swatch dire"></i>Dire</span></div></div>
+              <div id="shares"></div>
+            </article>
+            <article class="card change-card" aria-labelledby="change-title"><h3 id="change-title">Radiant win rate change</h3><div id="change"></div></article>
+          </div>
+          <div id="joint-note" class="info-note" hidden></div>
+        </section>
+        <section id="breakdown" aria-labelledby="breakdown-title">
+          <div class="section-heading breakdown-heading"><h2 id="breakdown-title">Group breakdown</h2><div class="segmented" role="group" aria-label="Group breakdown"><button id="by-duration" type="button" aria-pressed="true">By duration</button><button id="by-rank" type="button" aria-pressed="false">By rank</button></div></div>
+          <div class="card plot-card">
+            <div class="card-heading"><div><h3 id="break-title">Radiant win rate by final duration</h3><p class="subtle" id="break-scope"></p></div><div class="patch-legend" id="patch-legend"></div></div>
+            <div id="break-plot"></div>
+          </div>
+        </section>
+        <section id="standardization" aria-labelledby="std-title" hidden>
+          <details class="card disclosure"><summary><span><strong id="std-title">Rank-standardized comparison</strong><small>Compare both patches with the same mix of rank groups.</small></span><span class="disclosure-end"><b id="std-badge"></b><i class="chevron" aria-hidden="true"></i></span></summary><div class="detail-body" id="std-body"></div></details>
+        </section>
+        <section id="methods" aria-labelledby="method-title"><div class="section-heading"><h2 id="method-title">Data and methods</h2></div>
+          <details class="card disclosure" id="method-details"><summary><span><strong>Sample coverage and definitions</strong><small>Sampling dates, match eligibility and how to read the rates.</small></span><i class="chevron" aria-hidden="true"></i></summary>
+            <div class="detail-body">
+              <div id="coverage"></div>
+              <div class="method-grid">
+                <div><h4>Which matches qualify?</h4><p>Each sample includes ranked matches lasting at least 20 minutes. The duration groups use final game time. A 30-minute game belongs to the middle group, and a 40-minute game belongs to the longest group.</p></div>
+                <div><h4>How are rates calculated?</h4><p>Radiant win rate is the share of matches Radiant won. The side-to-side gap is the absolute difference between Radiant’s and Dire’s win rates. The patch change subtracts the first patch’s Radiant rate from the second’s, in percentage points.</p></div>
+                <div><h4>How are ranks grouped?</h4><p>The match’s average medal places it in one of three groups. Herald through Crusader, Archon through Ancient, and Divine with Immortal form the low, middle and high groups.</p></div>
+                <div><h4>What can these samples tell us?</h4><p>These rates describe the sampled matches. The patches can cover different dates, hours and player populations. Duration is known only after the game ends.</p></div>
+              </div>
+              <p class="source-line">Match data from <a href="https://www.opendota.com/">OpenDota</a>. <span id="rate-source"></span> <a href="report.html">Read the full analysis</a>.</p>
+            </div>
+          </details>
+        </section>
+      </div>
+      <p id="status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+    </div>
+  </main>
+</body>
+</html>
