@@ -1,0 +1,79 @@
+name: Update ranked win rates
+
+on:
+  schedule:
+    - cron: '17 9 * * *'
+  workflow_dispatch:
+    inputs:
+      max_backfill_days:
+        description: Additional missing dates to collect, oldest first (0 to 366)
+        required: false
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'data/live/**'
+      - 'data/live-patches.csv'
+      - '.github/workflows/live.yml'
+
+permissions: {}
+concurrency:
+  group: ranked-win-rates-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    timeout-minutes: 125
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - name: Set up R
+        if: github.event_name != 'push'
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+      - name: Install R packages
+        if: github.event_name != 'push'
+        run: Rscript -e 'install.packages(c("httr","jsonlite"), repos="https://cloud.r-project.org")'
+      - name: Collect and recompute patch totals
+        if: github.event_name != 'push'
+        env:
+          DOTA_BACKFILL_DAYS: ${{ inputs.max_backfill_days || vars.DOTA_BACKFILL_DAYS || '8' }}
+          OPENDOTA_API_KEY: ${{ secrets.OPENDOTA_API_KEY }}
+        run: Rscript scripts/live_update.R
+      - name: Validate published counts
+        run: node --test tests/*.cjs
+      - name: Commit verified archives and dashboard
+        if: github.event_name != 'push'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- data/live/ data/live-patches.csv docs/live-data.js
+          if ! git diff --cached --quiet; then
+            git commit -m "Update daily ranked match totals"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+      - name: Package the dashboard
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.pages.outputs.page_url }}
+    steps:
+      - name: Deploy the dashboard
+        id: pages
+        uses: actions/deploy-pages@v4

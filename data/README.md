@@ -1,6 +1,20 @@
 # Data
 
-## Raw inputs and sample sizes
+## Daily tracker archives
+
+Files named `live/YYYY-MM-DD.csv` contain counts for matches starting on that UTC date. Each row represents a combination of major patch, duration and average rank. The same date can contain two patches. The unique match ID in the source table and disjoint categories allow counts to be added across days.
+
+| Column | Meaning |
+| --- | --- |
+| `patch` | Major patch label, including its letter updates |
+| `duration_band` | `short` for under 20 minutes, `20-30` for 20 to under 30, `30-40` for 30 to under 40, `40+` from 40 minutes, or `unknown` |
+| `rank_band` | `low` for Herald through Crusader, `mid` for Archon through Ancient, `high` for Divine and Immortal, or `unknown` |
+| `n` | Ranked matches with recorded outcomes in this group |
+| `wins` | Radiant wins among those matches. Dire wins equal `n - wins` |
+
+For a filter or patch, sum `wins` and `n` first, then divide the two totals. A missing date indicates incomplete coverage. The historical match-level files described below belong to the earlier two-patch study.
+
+## Historical study inputs and sample sizes
 
 The project author supplied OpenDota match records for both patch labels. Raw CSVs are excluded from Git. For a local rebuild, place the files in `data/raw/` under the names below, or set `DOTA_PATCH_741_CSV` and `DOTA_PATCH_742_CSV` to their paths.
 
@@ -18,9 +32,9 @@ f91f69e0eb54dc686216f53e9d21f62fc39206d2b8a4a95b8471bdf1e1fc84cf  7.42dota2.csv
 
 Both supplied files support exact counts for every duration and rank combination. Snapshot filenames supply the patch labels. The source files lack an independently verified patch ID.
 
-The eligible match counts, Radiant wins and observation windows for these two files match the archived notebook. The explorer computes its rates from the exact win counts. [Archived results](../results/archived/README.md)
+The eligible match counts, Radiant wins and observation windows for these two files match the archived notebook. The archived study computes its rates from the exact win counts. [Archived results](../results/archived/README.md)
 
-## Required columns
+## Historical match columns
 
 | Column | Meaning |
 | --- | --- |
@@ -33,7 +47,7 @@ The eligible match counts, Radiant wins and observation windows for these two fi
 | `avg_rank_tier` | Average rank tier code |
 | `num_rank_tier` | Number of player ranks contributing to OpenDota’s average |
 
-## Eligibility rules
+## Historical study eligibility
 
 Ranked lobby, duration at least 1,200 seconds, recognized win indicator, positive numeric
 match ID string, rank code 11–15, 21–25, ..., 71–75, or exactly 80.
@@ -41,14 +55,13 @@ Divine and Immortal are pooled. The original rank rule does not include every co
 Exact duplicate rows are removed, and conflicting IDs or cross-patch overlap stop the pipeline.
 The descriptive mean medal averages ordinal medal steps with Immortal mapped to Divine 5.
 
-## Collecting new matches
+## Historical collection script
 
 `Rscript scripts/01_collect_data.R` queries the OpenDota Explorer endpoint and writes a timestamped
-CSV to `data/downloads/`. It retrieves recent eligible matches, not the exact historical data.
-Explorer availability, access restrictions, and API limits may change. The script has not been
-live-tested in this packaging session. API credentials are read from `OPENDOTA_API_KEY`;
-never commit credentials. Optional environment variables: `OPENDOTA_TARGET_N`,
+CSV to `data/downloads/`. This optional script retrieves recent eligible matches for a new snapshot.
+Explorer availability, access restrictions, and API limits may change. It reads an optional
+API key from `OPENDOTA_API_KEY`. Optional environment variables include `OPENDOTA_TARGET_N`,
 `OPENDOTA_PAGE_SIZE`, `OPENDOTA_OUTPUT_DIR`, `OPENDOTA_INPUT_CSV`.
 
-Source: [OpenDota](https://www.opendota.com/) / [API documentation](https://docs.opendota.com/).
+[OpenDota](https://www.opendota.com/) / [API documentation](https://docs.opendota.com/).
 Raw snapshots, processed data and downloads are ignored by Git by default.

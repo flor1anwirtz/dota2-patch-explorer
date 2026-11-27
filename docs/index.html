@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0e151e">
-  <meta name="description" content="Explore Radiant and Dire win rates across Dota 2 patches, ranked match lengths, and medal groups.">
+  <meta name="description" content="Daily Radiant and Dire win rates in OpenDota ranked matches from patch 7.40 onward.">
   <title>Dota 2 Patch Explorer</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="data.js" defer></script>
+  <script src="live-data.js" defer></script>
   <script src="standardize.js" defer></script>
   <script src="app.js" defer></script>
 </head>
@@ -21,12 +21,13 @@
   </header>
   <main id="top">
     <section class="hero">
-      <div class="container hero-inner"><h1>Radiant <span>vs.</span> Dire</h1><p>Compare side win rates across ranked Dota 2 patches, match lengths and rank groups.</p></div>
+      <div class="container hero-inner"><h1>Radiant <span>vs.</span> Dire</h1><p>Track Radiant and Dire win rates in OpenDota ranked matches from patch 7.40 onward.</p></div>
     </section>
     <div class="container content">
       <div id="error" role="alert" hidden></div>
       <noscript><p class="error-box">Enable JavaScript to explore the patch data.</p></noscript>
       <div id="dashboard" hidden>
+        <p class="update-line" id="updated"></p>
         <section id="comparison" aria-labelledby="comparison-title">
           <div class="section-heading"><h2 id="comparison-title">Patch comparison</h2><button id="reset" class="text-button" type="button" disabled>Clear filters</button></div>
           <div class="controls">
@@ -36,8 +37,8 @@
               <label for="second">Second patch<select id="second"></select></label>
             </div>
             <div class="filter-controls">
-              <label for="duration">Final duration<select id="duration"><option value="">All durations</option><option value="20-30">20 to &lt;30 min</option><option value="30-40">30 to &lt;40 min</option><option value="40+">40+ min</option></select></label>
-              <label for="rank">Rank group<select id="rank"><option value="">All ranks</option><option value="low">Herald to Crusader</option><option value="mid">Archon to Ancient</option><option value="high">Divine / Immortal</option></select></label>
+              <label for="duration">Final duration<select id="duration"><option value="20plus" selected>20+ min</option><option value="all">All durations</option><option value="short">Under 20 min</option><option value="20-30">20 to &lt;30 min</option><option value="30-40">30 to &lt;40 min</option><option value="40+">40+ min</option></select></label>
+              <label for="rank">Rank group<select id="rank"><option value="">All ranks</option><option value="low">Herald to Crusader</option><option value="mid">Archon to Ancient</option><option value="high">Divine / Immortal</option><option value="unknown">Unknown rank</option></select></label>
             </div>
           </div>
           <div class="summary-layout">
@@ -48,6 +49,11 @@
             <article class="card change-card" aria-labelledby="change-title"><h3 id="change-title">Radiant win rate change</h3><div id="change"></div></article>
           </div>
           <div id="joint-note" class="info-note" hidden></div>
+        </section>
+        <section id="overview" aria-labelledby="overview-title">
+          <div class="section-heading"><h2 id="overview-title">All patches</h2></div>
+          <p class="overview-scope" id="overview-scope"></p>
+          <div class="card overview-card"><table class="overview-table"><thead><tr><th scope="col">Patch</th><th scope="col">Matches</th><th scope="col">Radiant</th><th scope="col">Dire</th><th scope="col">Days covered</th><th scope="col">Latest UTC day</th></tr></thead><tbody id="patch-rows"></tbody></table></div>
         </section>
         <section id="breakdown" aria-labelledby="breakdown-title">
           <div class="section-heading breakdown-heading"><h2 id="breakdown-title">Group breakdown</h2><div class="segmented" role="group" aria-label="Group breakdown"><button id="by-duration" type="button" aria-pressed="true">By duration</button><button id="by-rank" type="button" aria-pressed="false">By rank</button></div></div>
@@ -60,20 +66,21 @@
           <details class="card disclosure"><summary><span><strong id="std-title">Rank-standardized comparison</strong><small>Compare both patches with the same mix of rank groups.</small></span><span class="disclosure-end"><b id="std-badge"></b><i class="chevron" aria-hidden="true"></i></span></summary><div class="detail-body" id="std-body"></div></details>
         </section>
         <section id="methods" aria-labelledby="method-title"><div class="section-heading"><h2 id="method-title">Data and methods</h2></div>
-          <details class="card disclosure" id="method-details"><summary><span><strong>Sample coverage and definitions</strong><small>Sampling dates, match eligibility and how to read the rates.</small></span><i class="chevron" aria-hidden="true"></i></summary>
+          <details class="card disclosure" id="method-details"><summary><span><strong>Coverage and definitions</strong><small>Collection dates, match eligibility and how to read the rates.</small></span><i class="chevron" aria-hidden="true"></i></summary>
             <div class="detail-body">
               <div id="coverage"></div>
               <div class="method-grid">
-                <div><h4>Which matches qualify?</h4><p>Each sample includes ranked matches lasting at least 20 minutes. The duration groups use final game time. A 30-minute game belongs to the middle group, and a 40-minute game belongs to the longest group.</p></div>
-                <div><h4>How are rates calculated?</h4><p>Radiant win rate is the share of matches Radiant won. The side-to-side gap is the absolute difference between Radiant’s and Dire’s win rates. The patch change subtracts the first patch’s Radiant rate from the second’s, in percentage points.</p></div>
-                <div><h4>How are ranks grouped?</h4><p>The match’s average medal places it in one of three groups. Herald through Crusader, Archon through Ancient, and Divine with Immortal form the low, middle and high groups.</p></div>
-                <div><h4>What can these samples tell us?</h4><p>These rates describe the sampled matches. The patches can cover different dates, hours and player populations. Duration is known only after the game ends.</p></div>
+                <div><h4>Which matches qualify?</h4><p>The tracker counts public ranked matches recorded by OpenDota with a known winner. The default duration filter includes games lasting at least 20 minutes. Select All durations to include shorter matches.</p></div>
+                <div><h4>How are rates calculated?</h4><p>Radiant win rate is the share of matches Radiant won. The side-to-side gap is the absolute difference between Radiant’s and Dire’s win rates. The patch change subtracts the first patch’s Radiant rate from the second’s, in percentage points. Its approximate 95% interval combines two Wilson score intervals and treats matches as independent.</p></div>
+                <div><h4>How are ranks grouped?</h4><p>The match’s average medal determines its rank group. All ranks includes matches with an unknown medal; select Unknown rank to see those games separately.</p></div>
+                <div><h4>What does coverage mean?</h4><p>A covered day has a successful count for its UTC date and patch. On a patch release day, a match’s start time determines which patch it belongs to. Partial coverage means some dates still need counts. The latest day shown can be later than a gap.</p></div>
               </div>
-              <p class="source-line">Match data from <a href="https://www.opendota.com/">OpenDota</a>. <span id="rate-source"></span> <a href="report.html">Read the full analysis</a>.</p>
+              <p class="source-line">Match data from <a href="https://www.opendota.com/">OpenDota</a>. Major patch totals include their letter updates.</p>
             </div>
           </details>
         </section>
       </div>
+      <p class="archive-link"><a href="report.html">Original 7.41 vs. 7.42 research report</a></p>
       <p id="status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
     </div>
   </main>
