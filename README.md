@@ -4,7 +4,9 @@ Did Radiant’s advantage change between patches 7.41 and 7.42? In 1,438,598 sam
 
 ## Open the explorer
 
-Download and extract the repository, then open `docs/index.html` in a browser. Keep the folder together to use it offline. [Explorer entry point](docs/index.html)
+[Open the interactive patch explorer](https://flor1anwirtz.github.io/dota2-patch-explorer/)
+
+To use it offline, download and extract the repository, then open `docs/index.html` in a browser.
 
 1. Choose the **First patch** and **Second patch**. The change in win rate is calculated as the second patch minus the first.
 2. Under **Final duration**, select **20 to &lt;30 min**. Radiant won **61.82%** of these games in 7.41 and **56.65%** in 7.42. For games that lasted 40 minutes or longer, Dire led in both samples.
@@ -21,7 +23,7 @@ Both original match files supply exact game and win counts for all nine duration
 
 Rank standardization gives both patches the same rank mix. The explorer pools both full samples to calculate fixed weights for Herald–Crusader, Archon–Ancient and Divine/Immortal, then applies them to each patch’s rank-specific rates. Radiant’s win rate fell by approximately **2.44 percentage points** with those weights, compared with **2.46 points** in the raw totals.
 
-Snapshot filenames supply the patch labels. The samples cover different dates, and individual players can appear more than once. Duration groups describe games that ended within each interval. These data alone cannot isolate a patch effect or predict a player’s odds at the draft. [Read the research report](docs/report.html) · [Quarto source](report.qmd) · [Original notebook](notebooks/patch_comparison_original.ipynb) · [Archived results](results/archived/README.md)
+Snapshot filenames supply the patch labels. The samples cover different dates, and individual players can appear more than once. Duration groups describe games that ended within each interval. These data alone cannot isolate a patch effect or predict a player’s odds at the draft. [Read the research report](https://flor1anwirtz.github.io/dota2-patch-explorer/report.html) · [Quarto source](report.qmd) · [Original notebook](notebooks/patch_comparison_original.ipynb) · [Archived results](results/archived/README.md)
 
 ## Rebuild from match records
 
