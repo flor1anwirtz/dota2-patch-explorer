@@ -1,5 +1,5 @@
 window.LIVE_DATA = {
-  "asOfUtc": "2026-11-27T03:53:03Z",
+  "asOfUtc": "2026-11-27T03:55:08Z",
   "throughDate": "2026-11-26",
   "patches": [
     {
@@ -137,7 +137,7 @@ window.LIVE_DATA = {
       "id": "7.41",
       "firstDay": "2026-03-24",
       "lastDay": "2026-11-18",
-      "coveredDays": 202,
+      "coveredDays": 210,
       "expectedDays": 240,
       "latestDay": "2026-11-18",
       "complete": false,
@@ -145,26 +145,26 @@ window.LIVE_DATA = {
         {
           "duration": "short",
           "rank": "low",
-          "n": 174004,
-          "wins": 95604
+          "n": 181561,
+          "wins": 99693
         },
         {
           "duration": "20-30",
           "rank": "low",
-          "n": 2055791,
-          "wins": 1299776
+          "n": 2137204,
+          "wins": 1351153
         },
         {
           "duration": "30-40",
           "rank": "low",
-          "n": 10709407,
-          "wins": 5965966
+          "n": 11136544,
+          "wins": 6203142
         },
         {
           "duration": "40+",
           "rank": "low",
-          "n": 18118266,
-          "wins": 9110633
+          "n": 18820273,
+          "wins": 9462868
         },
         {
           "duration": "unknown",
@@ -175,26 +175,26 @@ window.LIVE_DATA = {
         {
           "duration": "short",
           "rank": "mid",
-          "n": 216246,
-          "wins": 128099
+          "n": 227361,
+          "wins": 134605
         },
         {
           "duration": "20-30",
           "rank": "mid",
-          "n": 4113287,
-          "wins": 2575061
+          "n": 4334322,
+          "wins": 2713956
         },
         {
           "duration": "30-40",
           "rank": "mid",
-          "n": 17995739,
-          "wins": 9882902
+          "n": 18982966,
+          "wins": 10425160
         },
         {
           "duration": "40+",
           "rank": "mid",
-          "n": 24447248,
-          "wins": 12204816
+          "n": 25781743,
+          "wins": 12870012
         },
         {
           "duration": "unknown",
@@ -205,26 +205,26 @@ window.LIVE_DATA = {
         {
           "duration": "short",
           "rank": "high",
-          "n": 94050,
-          "wins": 57263
+          "n": 99033,
+          "wins": 60247
         },
         {
           "duration": "20-30",
           "rank": "high",
-          "n": 1336854,
-          "wins": 808134
+          "n": 1405210,
+          "wins": 849441
         },
         {
           "duration": "30-40",
           "rank": "high",
-          "n": 3997797,
-          "wins": 2154429
+          "n": 4203867,
+          "wins": 2265765
         },
         {
           "duration": "40+",
           "rank": "high",
-          "n": 4301062,
-          "wins": 2143467
+          "n": 4518011,
+          "wins": 2251345
         },
         {
           "duration": "unknown",
@@ -235,26 +235,26 @@ window.LIVE_DATA = {
         {
           "duration": "short",
           "rank": "unknown",
-          "n": 53173,
-          "wins": 28416
+          "n": 55073,
+          "wins": 29436
         },
         {
           "duration": "20-30",
           "rank": "unknown",
-          "n": 280356,
-          "wins": 165294
+          "n": 290640,
+          "wins": 171517
         },
         {
           "duration": "30-40",
           "rank": "unknown",
-          "n": 1067327,
-          "wins": 586889
+          "n": 1112803,
+          "wins": 612020
         },
         {
           "duration": "40+",
           "rank": "unknown",
-          "n": 1752296,
-          "wins": 883636
+          "n": 1825728,
+          "wins": 920407
         },
         {
           "duration": "unknown",
