@@ -31,6 +31,8 @@ Rscript scripts/live_export.R --timeline=data/live-patches.csv
 
 In **Settings → Pages → Build and deployment → Source**, select **GitHub Actions**. The workflow validates the counts and deploys the site's `docs/` folder. Open **Actions → Update ranked win rates** to view logs or start a manual run. [Daily workflow](.github/workflows/live.yml)
 
+To resume the initial history through November 26, 2026, select **Fill the initial archive** in the manual workflow. Each batch saves up to eight missing dates. If a run reaches its four-hour time limit, another run picks up from the saved dates. The scheduled updater continues collecting new dates after the initial archive is complete.
+
 ## Original 7.41 and 7.42 study
 
 The original report compared fixed samples of **938,598** eligible games in 7.41 and **500,000** in 7.42. Radiant won **53.01%** and **50.56%**, respectively. Those samples cover selected dates, require a known medal, and include only games lasting at least 20 minutes. The historical tables and five figures retain those definitions. [Read the illustrated report](https://flor1anwirtz.github.io/dota2-patch-explorer/report.html) · [Figures](figures/) · [Archived results](results/archived/) · [Original notebook](notebooks/patch_comparison_original.ipynb)

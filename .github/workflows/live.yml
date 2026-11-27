@@ -5,6 +5,10 @@ on:
     - cron: '17 9 * * *'
   workflow_dispatch:
     inputs:
+      bootstrap_until_complete:
+        description: Fill the initial archive through 2026-11-26 (8 days per checkpoint for up to 4 hours)
+        type: boolean
+        default: false
       max_backfill_days:
         description: Additional missing dates to collect, oldest first (0 to 366)
         required: false
@@ -19,38 +23,44 @@ on:
 
 permissions: {}
 concurrency:
-  group: ranked-win-rates-pages
+  group: ${{ (github.event_name == 'workflow_dispatch' && inputs.bootstrap_until_complete && 'ranked-historical-backfill') || (github.event_name == 'push' && 'ranked-source-publish') || 'ranked-daily-collector' }}
   cancel-in-progress: false
 
 jobs:
   build:
     if: github.ref_name == github.event.repository.default_branch
-    runs-on: ubuntu-latest
-    timeout-minutes: 125
+    runs-on: ubuntu-24.04
+    timeout-minutes: 295
+    outputs:
+      site_sha: ${{ steps.snapshot.outputs.sha }}
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.repository.default_branch }}
-      - name: Set up R
+      - name: Install R and prebuilt HTTP and JSON libraries
         if: github.event_name != 'push'
-        uses: r-lib/actions/setup-r@v2
-        with:
-          r-version: 'release'
-      - name: Install R packages
-        if: github.event_name != 'push'
-        run: Rscript -e 'install.packages(c("httr","jsonlite"), repos="https://cloud.r-project.org")'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends r-base-core r-cran-httr r-cran-jsonlite
+          /usr/bin/Rscript -e 'stopifnot(requireNamespace("httr", quietly=TRUE), requireNamespace("jsonlite", quietly=TRUE))'
+      - name: Resume the initial historical archive
+        if: github.event_name == 'workflow_dispatch' && inputs.bootstrap_until_complete
+        env:
+          RSCRIPT: /usr/bin/Rscript
+          OPENDOTA_API_KEY: ${{ secrets.OPENDOTA_API_KEY }}
+        run: bash scripts/live_bootstrap.sh
       - name: Collect and recompute patch totals
-        if: github.event_name != 'push'
+        if: github.event_name != 'push' && !inputs.bootstrap_until_complete
         env:
           DOTA_BACKFILL_DAYS: ${{ inputs.max_backfill_days || vars.DOTA_BACKFILL_DAYS || '8' }}
           OPENDOTA_API_KEY: ${{ secrets.OPENDOTA_API_KEY }}
-        run: Rscript scripts/live_update.R
+        run: /usr/bin/Rscript scripts/live_update.R
       - name: Validate published counts
         run: node --test tests/*.cjs
       - name: Commit verified archives and dashboard
-        if: github.event_name != 'push'
+        if: github.event_name != 'push' && !inputs.bootstrap_until_complete
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -59,6 +69,9 @@ jobs:
             git commit -m "Update daily ranked match totals"
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
+      - name: Identify the validated snapshot
+        id: snapshot
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: Package the dashboard
         uses: actions/upload-pages-artifact@v3
         with:
@@ -66,14 +79,33 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-ranked-dashboard
+      cancel-in-progress: false
+    runs-on: ubuntu-24.04
     permissions:
+      contents: read
       pages: write
       id-token: write
     environment:
       name: github-pages
       url: ${{ steps.pages.outputs.page_url }}
     steps:
+      - name: Check that this snapshot is still current
+        id: head
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.event.repository.default_branch }}
+          SITE_SHA: ${{ needs.build.outputs.site_sha }}
+        run: |
+          latest=$(gh api "repos/$REPO/branches/$BRANCH" --jq .commit.sha)
+          if [[ "$latest" == "$SITE_SHA" ]]; then
+            echo "current=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "A newer source commit superseded this artifact."
+          fi
       - name: Deploy the dashboard
+        if: steps.head.outputs.current == 'true'
         id: pages
         uses: actions/deploy-pages@v4
