@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10131b">
+  <meta name="description" content="Verify a daily Dota 2 ranked match archive against its saved checksum and reproduce the counts in OpenDota.">
+  <title>Verify a day · Dota 2 Patch Explorer</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="verify.css">
+  <script src="verify.js" defer></script>
+</head>
+<body class="audit">
+  <a class="skip-link" href="#archive">Skip to daily archive</a>
+  <header class="audit-top">
+    <div class="audit-wrap audit-nav">
+      <a class="brand" href="./index.html" aria-label="Dota 2 Patch Explorer home"><i class="brand-mark" aria-hidden="true"></i><strong>Dota 2</strong><span class="brand-separator" aria-hidden="true"></span><span>Patch Explorer</span></a>
+      <nav aria-label="Site"><a href="./index.html">Dashboard</a><a href="./verify.html" aria-current="page">Verify a day</a></nav>
+    </div>
+  </header>
+  <main>
+    <header class="audit-hero">
+      <div class="audit-wrap"><h1>Verify a day</h1><p>Check a daily CSV against its archived fingerprint, then reproduce the match counts with OpenDota.</p></div>
+    </header>
+    <div class="audit-wrap audit-content" id="archive">
+      <noscript><p>Enable JavaScript to choose a date, or <a href="https://github.com/flor1anwirtz/dota2-patch-explorer/tree/main/data/live">browse the CSV archive on GitHub</a>.</p></noscript>
+      <p id="load-message" role="status">Loading the daily archive…</p>
+      <div id="audit-report" hidden>
+        <div class="audit-daybar">
+          <div><label for="archive-date">Archive date <span>UTC</span></label>
+            <div class="date-controls">
+              <button type="button" id="prev-day" aria-label="Previous archived day" title="Previous archived day">‹</button>
+              <select id="archive-date"></select>
+              <button type="button" id="next-day" aria-label="Next archived day" title="Next archived day">›</button>
+            </div>
+          </div>
+          <div class="day-actions"><a id="download-csv" class="audit-action primary" download>Download CSV</a><a id="github-file" class="audit-action">View on GitHub</a></div>
+        </div>
+        <p id="date-note" role="status" hidden></p>
+        <div class="audit-grid">
+          <section class="audit-panel totals" aria-labelledby="totals-title">
+            <div class="audit-heading"><h2 id="totals-title">Archived results</h2><span>All durations · All ranks</span></div>
+            <dl class="day-metrics">
+              <div><dt>Ranked matches</dt><dd id="metric-n">—</dd></div>
+              <div><dt><i class="team-dot rad"></i>Radiant wins</dt><dd id="metric-rad">—</dd></div>
+              <div><dt><i class="team-dot dire"></i>Dire wins</dt><dd id="metric-dire">—</dd></div>
+            </dl>
+            <div class="audit-table-wrap">
+              <table class="audit-table"><caption class="sr-only">Match counts and win rates by patch during this UTC day</caption>
+                <thead><tr><th scope="col">Patch / UTC window</th><th scope="col">Matches</th><th scope="col">Radiant wins</th><th scope="col">Dire wins</th><th scope="col">Radiant rate</th></tr></thead>
+                <tbody id="patch-values"></tbody>
+              </table>
+            </div>
+          </section>
+          <section class="audit-panel fingerprint" aria-labelledby="file-title">
+            <h2 id="file-title">File integrity</h2>
+            <p class="hash-status" id="hash-status" role="status">Checking CSV…</p>
+            <p id="hash-detail"></p>
+            <p class="hash-label">Archived SHA-256</p><code id="expected-hash" class="hash-string"></code>
+            <div id="actual-digest" hidden><p class="hash-label">Downloaded SHA-256</p><code class="hash-string" id="actual-hash"></code></div>
+          </section>
+        </div>
+        <section class="audit-panel reproduce" aria-labelledby="repro-title">
+          <div class="audit-heading"><h2 id="repro-title">Reproduce the counts</h2></div>
+          <p>Run this independent count of ranked matches with a known winner. Compare the results with the patch rows above.</p>
+          <div class="source-tools"><button id="compare-source" type="button" class="audit-action primary">Compare with OpenDota</button><a id="query-link" class="audit-action" target="_blank" rel="noopener">Open API JSON</a></div>
+          <div class="source-result" id="source-result" role="status" aria-live="polite" aria-atomic="true" hidden><strong id="source-title"></strong><p id="source-detail"></p><ul id="source-differences" hidden></ul></div>
+          <div class="sql-frame">
+            <div class="code-header"><span>OpenDota Explorer SQL</span><button class="copy-button" id="copy-sql" type="button">Copy SQL</button></div>
+            <pre><code id="audit-sql"></code></pre>
+          </div>
+          <div class="repro-r"><h3>Check each duration and rank group in R</h3><p>From a local copy of the repository, run the command for this date.</p>
+            <div class="r-shell"><code id="r-command"></code><button class="copy-button" id="copy-r" type="button">Copy command</button></div>
+          </div>
+          <p class="source-limits">The checksum verifies the saved file. A live recount can change when OpenDota adds late matches. Older dates can also fall outside its retained history.</p>
+        </section>
+        <p id="copy-status" role="status" aria-live="polite" class="sr-only"></p>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

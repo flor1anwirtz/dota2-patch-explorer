@@ -1,7 +1,6 @@
 # Run from the repository root: Rscript scripts/live_update.R
 # DOTA_BACKFILL_DAYS controls the maximum number of additional missing days per run.
-source("scripts/live_collect.R")
-source("scripts/live_export.R")
+source("scripts/verify_day.R")
 
 # A corrected release timestamp can change day groups without changing either date.
 # Compare all effective intervals on archived days whenever the timeline changes.
@@ -82,7 +81,8 @@ live_update <- function(bootstrap_until = NULL) {
   for (day in planned) {
     done <- tryCatch({
       live_collect_day(day, timeline, dir = work)
-      live_read_counts(file.path(work, paste0(day, ".csv")), live_day_labels(day, boundaries))
+      counts <- live_read_counts(file.path(work, paste0(day, ".csv")), live_day_labels(day, boundaries))
+      verify_source_totals(day, boundaries, counts)
       TRUE
     }, error = function(err) {
       message("Could not update ", day, ": ", conditionMessage(err))

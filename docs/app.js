@@ -69,16 +69,25 @@
     }
     try { history.replaceState(null, "", url.href); } catch { /* Offline exploration still works. */ }
   }
+  const trackedMatches = [...patches.values()].reduce((total, patch) =>
+    total + (pick(patch, "all", "")?.n || 0), 0);
+  $("tracked-total").textContent = nf.format(trackedMatches);
+  $("tracked-through").textContent = ids.length + (ids.length === 1 ? " patch" : " patches") +
+    " · All durations";
+  $("hero-stats").hidden = false;
+
   function shareRow(patch, group) {
     const r = rate(group);
     const count = Number.isSafeInteger(group?.n) ? nf.format(group.n) + " matches" : "";
+    const odds = r === null ? '<p class="na">' +
+      (group?.n === 0 ? 'No matches in this group.' : 'Awaiting collected match dates.') + '</p>' :
+      '<div class="score-line"><strong class="radiant-score"><span class="sr-only">Radiant </span>' + pct(r) +
+      '</strong><span aria-hidden="true" class="parity-label">50%</span><strong class="dire-score">' +
+      '<span class="sr-only">Dire </span>' + pct(100-r) + '</strong></div>' +
+      '<div aria-hidden="true" class="stack"><div class="radiant" style="width:' + r +
+      '%"></div><div class="dire"></div></div>';
     return '<div class="share-row"><div class="share-head"><strong>Patch ' + safe(patch.id) +
-      '</strong><span class="count">' + count + '</span></div>' +
-      (r === null ? '<p class="na">' + (group?.n === 0 ? 'No matches in this group.' : 'Awaiting collected match dates.') + '</p>' :
-       '<div class="share-figures"><span><span class="sr-only">Radiant </span>' + pct(r) +
-       '</span><span><span class="sr-only">Dire </span>' + pct(100 - r) +
-       '</span></div><div aria-hidden="true" class="stack"><div class="radiant" style="width:' + r +
-       '%"></div><div class="dire"></div></div>') + '</div>';
+      '</strong><span class="count">' + count + '</span></div>' + odds + '</div>';
   }
   function wilson(group) {
     const z = 1.95996398454;
@@ -100,11 +109,11 @@
     const [bLow, bHigh] = wilson(second);
     const low = delta - Math.hypot(bRate - 100*bLow, 100*aHigh - aRate);
     const high = delta + Math.hypot(100*bHigh - bRate, aRate - 100*aLow);
-    $("change").innerHTML = '<div class="change-value">' + pp(delta) +
-      '<small title="percentage points">pp</small></div><p class="change-context">Patch ' + safe(a.id) +
-      ' → Patch ' + safe(b.id) + '</p><p class="change-detail">Side-to-side gap <strong>' +
-      sideGap(aRate) + ' pp → ' + sideGap(bRate) + ' pp</strong>. <span class="ci">95% CI ' +
-      pp(low) + ' to ' + pp(high) + ' pp.</span></p>';
+    $("change").innerHTML = '<p class="change-context">Patch ' + safe(a.id) + ' → Patch ' + safe(b.id) + '</p>' +
+      '<div class="change-value">' + pp(delta) +
+      '<small title="percentage points">pp</small></div><dl class="change-detail"><div><dt>Side-to-side gap</dt>' +
+      '<dd>' + sideGap(aRate) + ' → ' + sideGap(bRate) + ' pp</dd></div>' +
+      '<div><dt>95% CI on change</dt><dd>' + pp(low) + ' to ' + pp(high) + ' pp</dd></div></dl>';
   }
   function axisRange(rates) {
     const low = Math.min(50, ...rates), high = Math.max(50, ...rates);
@@ -191,21 +200,21 @@
   }
   function renderCoverage(a,b) {
     $("updated").textContent = "Updated " + displayDay(data.asOfUtc, updateFormat) +
-      " UTC · Tracking UTC match dates through " + displayDay(data.throughDate);
+      " UTC · Match dates through " + displayDay(data.throughDate);
     $("overview-scope").textContent = durations[state.duration] + " · " + (bands.rank[state.rank] || "All ranks");
     $("patch-rows").innerHTML = ids.slice().reverse().map(id => {
       const p = patches.get(id);
       const group = pick(p, state.duration, state.rank);
       const r = rate(group);
-      const cells = [
-        ["Matches",group ? nf.format(group.n) : "—"],
-        ["Radiant",r === null ? "—" : pct(r)],
-        ["Dire",r === null ? "—" : pct(100-r)],
-        ["Days covered",p.coveredDays + "/" + p.expectedDays + " · " + coverageText(p)],
-        ["Latest UTC day",displayDay(p.latestDay)]
-      ];
-      return '<tr><th scope="row">Patch ' + safe(id) + '</th>' + cells.map(([name,value]) =>
-        '<td data-label="' + name + '">' + safe(value) + '</td>').join("") + '</tr>';
+      const valueCell = (name, value) => '<td data-label="' + name + '">' + safe(value) + '</td>';
+      const covered = p.expectedDays ? Math.min(100, 100*p.coveredDays/p.expectedDays) : 0;
+      return '<tr><th scope="row">Patch ' + safe(id) + '</th>' +
+        valueCell("Matches", group ? nf.format(group.n) : "—") +
+        valueCell("Radiant", r === null ? "—" : pct(r)) + valueCell("Dire", r === null ? "—" : pct(100-r)) +
+        '<td data-label="Days covered"><span class="coverage-cell"><span>' +
+        safe(p.coveredDays) + '/' + safe(p.expectedDays) + ' · ' + safe(coverageText(p)) +
+        '</span><i aria-hidden="true"><b style="width:' + covered + '%"></b></i></span></td>' +
+        valueCell("Latest UTC day", displayDay(p.latestDay)) + '</tr>';
     }).join("");
     const selected = a.id === b.id ? [a] : [a,b];
     $("coverage").innerHTML = selected.map(p => '<p class="coverage-item"><strong>Patch ' + safe(p.id) +

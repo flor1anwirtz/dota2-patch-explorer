@@ -14,6 +14,8 @@ Files named `live/YYYY-MM-DD.csv` contain counts for matches starting on that UT
 
 For a filter or patch, sum `wins` and `n` first, then divide the two totals. A missing date indicates incomplete coverage. The historical match-level files described below belong to the earlier two-patch study.
 
+For a byte-for-byte copy, open the selected UTC date on the verification page and follow its Git commit. A live re-query requires that OpenDota still retain that day. The CSV contains grouped counts and can reproduce the dashboard totals without individual match IDs. [Verify a day](https://flor1anwirtz.github.io/dota2-patch-explorer/verify.html)
+
 ## Historical study inputs and sample sizes
 
 The project author supplied OpenDota match records for both patch labels. Raw CSVs are excluded from Git. For a local rebuild, place the files in `data/raw/` under the names below, or set `DOTA_PATCH_741_CSV` and `DOTA_PATCH_742_CSV` to their paths.

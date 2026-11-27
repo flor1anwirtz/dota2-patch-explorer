@@ -24,3 +24,7 @@ Thumbs.db
 report.html
 report_files/
 !docs/report.html
+
+# GitHub Pages archive audit assets (built from data/live)
+docs/audit-days.json
+docs/verify-data/

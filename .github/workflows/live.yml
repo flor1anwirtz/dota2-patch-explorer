@@ -19,6 +19,7 @@ on:
       - 'docs/**'
       - 'data/live/**'
       - 'data/live-patches.csv'
+      - 'scripts/audit_manifest.cjs'
       - '.github/workflows/live.yml'
 
 permissions: {}
@@ -45,6 +46,9 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends r-base-core r-cran-httr r-cran-jsonlite
           /usr/bin/Rscript -e 'stopifnot(requireNamespace("httr", quietly=TRUE), requireNamespace("jsonlite", quietly=TRUE))'
+      - name: Test independent daily verification
+        if: github.event_name != 'push'
+        run: /usr/bin/Rscript tests/verify_day.R
       - name: Resume the initial historical archive
         if: github.event_name == 'workflow_dispatch' && inputs.bootstrap_until_complete
         env:
@@ -69,9 +73,15 @@ jobs:
             git commit -m "Update daily ranked match totals"
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
-      - name: Identify the validated snapshot
+      - name: Build and verify downloadable daily archives at the validated commit
         id: snapshot
-        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+        run: |
+          git diff --exit-code HEAD -- data/live data/live-patches.csv docs/live-data.js
+          test -z "$(git ls-files --others --exclude-standard -- data/live/)"
+          export AUDIT_SOURCE_SHA="$(git rev-parse HEAD)"
+          node scripts/audit_manifest.cjs
+          node scripts/audit_manifest.cjs --check
+          echo "sha=$AUDIT_SOURCE_SHA" >> "$GITHUB_OUTPUT"
       - name: Package the dashboard
         uses: actions/upload-pages-artifact@v3
         with:
