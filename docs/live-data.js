@@ -1,5 +1,5 @@
 window.LIVE_DATA = {
-  "asOfUtc": "2026-11-27T04:00:55Z",
+  "asOfUtc": "2026-11-27T19:02:06Z",
   "throughDate": "2026-11-26",
   "patches": [
     {
