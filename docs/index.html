@@ -15,7 +15,7 @@
   <a href="#comparison" class="skip-link">Skip to comparison</a>
   <header class="topbar">
     <div class="container topbar-inner">
-      <a href="#top" class="brand" aria-label="Dota 2 Patch Explorer home"><i class="brand-mark" aria-hidden="true"></i><strong>Dota 2</strong><span class="brand-separator" aria-hidden="true"></span><span>Patch Explorer</span></a>
+      <a href="#top" class="brand" aria-label="Dota 2 Patch Explorer home"><strong>Dota 2</strong><span class="brand-separator" aria-hidden="true"></span><span>Patch Explorer</span></a>
       <nav class="main-nav" aria-label="Sections"><a class="nav-compare" href="#comparison">Comparison</a><a href="#overview">Patches</a><a class="nav-breakdown" href="#breakdown">Breakdown</a><a class="nav-verify" href="./verify.html">Verify a day</a></nav>
     </div>
   </header>
@@ -63,11 +63,21 @@
           <div class="card overview-card"><table class="overview-table"><thead><tr><th scope="col">Patch</th><th scope="col">Matches</th><th scope="col">Radiant</th><th scope="col">Dire</th><th scope="col">Days covered</th><th scope="col">Latest UTC day</th></tr></thead><tbody id="patch-rows"></tbody></table></div>
         </section>
         <section id="breakdown" aria-labelledby="breakdown-title">
-          <div class="section-heading breakdown-heading"><h2 id="breakdown-title">Group breakdown</h2><div class="segmented" role="group" aria-label="Group breakdown"><button id="by-duration" type="button" aria-pressed="true">By duration</button><button id="by-rank" type="button" aria-pressed="false">By rank</button></div></div>
-          <div class="card plot-card">
-            <div class="card-heading"><div><h3 id="break-title">Radiant win rate by final duration</h3><p class="subtle" id="break-scope"></p></div><div class="patch-legend" id="patch-legend"></div></div>
-            <div id="break-plot"></div>
+          <div class="section-heading breakdown-heading">
+            <div><h2 id="breakdown-title">Group breakdown</h2><p class="overview-scope" id="break-scope"></p></div>
+            <div class="segmented" role="group" aria-label="Group breakdown">
+              <button id="by-duration" type="button" aria-pressed="true">By duration</button>
+              <button id="by-rank" type="button" aria-pressed="false">By rank</button>
+            </div>
           </div>
+          <div class="card overview-card">
+            <table class="overview-table breakdown-table" id="break-table" aria-labelledby="breakdown-title" aria-describedby="break-scope">
+              <colgroup span="1"></colgroup><colgroup span="3"></colgroup><colgroup span="3"></colgroup>
+              <thead id="break-head"></thead>
+              <tbody id="break-rows"></tbody>
+            </table>
+          </div>
+          <p id="break-empty" class="subtle" hidden>A dash means the group has no reported win rate.</p>
         </section>
         <section id="standardization" aria-labelledby="std-title" hidden>
           <details class="card disclosure"><summary><span><strong id="std-title">Rank-standardized comparison</strong><small>Compare both patches with the same mix of rank groups.</small></span><span class="disclosure-end"><b id="std-badge"></b><i class="chevron" aria-hidden="true"></i></span></summary><div class="detail-body" id="std-body"></div></details>

@@ -115,65 +115,44 @@
       '<dd>' + sideGap(aRate) + ' → ' + sideGap(bRate) + ' pp</dd></div>' +
       '<div><dt>95% CI on change</dt><dd>' + pp(low) + ' to ' + pp(high) + ' pp</dd></div></dl>';
   }
-  function axisRange(rates) {
-    const low = Math.min(50, ...rates), high = Math.max(50, ...rates);
-    const span = high - low;
-    const step = span > 45 ? 20 : span > 20 ? 10 : span > 6 ? 5 : span > 3 ? 2 : 1;
-    let min = Math.max(0, Math.floor((low - step * .2) / step) * step);
-    let max = Math.min(100, Math.ceil((high + step * .2) / step) * step);
-    if (min === max) { min = Math.max(0, min-step); max = Math.min(100, max+step); }
-    const ticks = [];
-    for (let v = min; v <= max; v += step) ticks.push(v);
-    if (min < 50 && max > 50 && !ticks.includes(50)) ticks.push(50);
-    ticks.sort((a,b) => a-b);
-    return {min,max,ticks, pos: v => 100 * (v - min) / (max - min)};
-  }
-  function numericCell(group) {
-    const r = rate(group);
-    return '<span class="plot-value">' + (r === null ? '<span aria-label="Not available">—</span>' : pct(r)) +
-      (Number.isSafeInteger(group?.n) ? '<small>' + nf.format(group.n) + ' games</small>' : '') + '</span>';
-  }
-  function drawTrack(a, b, scale) {
-    const ticks = scale.ticks.map(t => '<i class="tick ' + (t === 50 ? "parity" : "") +
-      '" style="left:' + scale.pos(t) + '%"></i>').join("");
-    let line = "";
-    if (a !== null && b !== null) {
-      line = '<i class="link-line" style="left:' + scale.pos(Math.min(a,b)) +
-        '%;width:' + Math.abs(scale.pos(a)-scale.pos(b)) + '%"></i>';
+  function renderBreakdown(a, b) {
+    const byDuration = state.by === "duration";
+    const scope = byDuration ? bands.rank[state.rank] || "All ranks" : durations[state.duration];
+    $("by-duration").setAttribute("aria-pressed", byDuration);
+    $("by-rank").setAttribute("aria-pressed", !byDuration);
+    $("break-scope").textContent = scope +
+      (byDuration && state.duration === "all" ? " · Known durations" : "");
+
+    const patchLabels = [a, b].map(patch => "Patch " + safe(patch.id));
+    const columnGroups = patchLabels.map(label =>
+      '<th scope="colgroup" colspan="3">' + label + '</th>').join("");
+    const metrics = '<th scope="col">Matches</th><th scope="col">Radiant</th><th scope="col">Dire</th>';
+    $("break-head").innerHTML = '<tr><th scope="col" rowspan="2">' +
+      (byDuration ? "Final duration" : "Rank group") + '</th>' + columnGroups +
+      '</tr><tr>' + metrics + metrics + '</tr>';
+
+    let missingRate = false;
+    const rows = [];
+    for (const [key, label] of Object.entries(bands[state.by])) {
+      if (byDuration && state.duration === "20plus" && key === "short") continue;
+      const cells = [a, b].map((patch, index) => {
+        const group = byDuration ? pick(patch, key, state.rank) : pick(patch, state.duration, key);
+        const r = rate(group);
+        if (r === null) missingRate = true;
+        const patchAttr = ' data-patch="' + patchLabels[index] + '"';
+        return '<td class="match-count" data-label="Matches"' + patchAttr + '>' +
+          (group ? nf.format(group.n) : "—") + '</td>' +
+          '<td class="radiant-rate" data-label="Radiant"' + patchAttr + '>' +
+          (r === null ? "—" : pct(r)) + '</td>' +
+          '<td class="dire-rate" data-label="Dire"' + patchAttr + '>' +
+          (r === null ? "—" : pct(100 - r)) + '</td>';
+      });
+      const selected = state[state.by] === key ? ' class="is-selected"' : '';
+      rows.push('<tr' + selected + ' data-first-label="' + patchLabels[0] + '" data-second-label="' +
+        patchLabels[1] + '"><th scope="row">' + safe(label) + '</th>' + cells.join("") + '</tr>');
     }
-    const dot = (v, cls) => v === null ? "" : '<i class="point ' + cls + '" style="left:' + scale.pos(v) + '%"></i>';
-    return '<span aria-hidden="true" class="track">' + ticks + line + dot(a, "dot-a") + dot(b, "dot-b") + '</span>';
-  }
-  function renderBreakdown(a,b) {
-    const by = state.by;
-    const other = by === "duration" ? "rank" : "duration";
-    const opposite = state[other];
-    const select = (p, key) => by === "duration" ? pick(p,key,opposite) : pick(p,opposite,key);
-    const groups = Object.entries(bands[by]).filter(([key]) =>
-      !(by === "duration" && state.duration === "20plus" && key === "short"));
-    const rows = groups.map(([key,label]) => ({key,label,
-       a: select(a,key), b: select(b,key)}));
-    const scale = axisRange(rows.flatMap(row => [rate(row.a), rate(row.b)]).filter(Number.isFinite));
-    $("by-duration").setAttribute("aria-pressed", by === "duration");
-    $("by-rank").setAttribute("aria-pressed", by === "rank");
-    $("break-title").textContent = "Radiant win rate by " + (by === "duration" ? "final duration" : "rank group");
-    const scope = by === "rank" ? durations[state.duration] : bands.rank[state.rank] || "All ranks";
-    $("break-scope").textContent = scope + ". The reference line marks 50%." +
-      (by === "duration" && state.duration === "all" ? " Only known durations are plotted." : "");
-    $("patch-legend").innerHTML = '<span><i class="dot-a"></i>Patch ' + safe(a.id) +
-      '</span><span><i class="dot-b"></i>Patch ' + safe(b.id) + '</span>';
-    const labels = scale.ticks.map((t,i) => '<span aria-hidden="true" class="' +
-      (t === 50 ? "parity" : i === 0 || i === scale.ticks.length-1 ? "" : "minor") +
-      '" style="left:' + scale.pos(t) + '%">' + t + '%</span>').join("");
-    $("break-plot").innerHTML = '<div class="plot-grid plot-head" aria-hidden="true"><span>Group</span><div class="axis">' + labels +
-      '</div><span>' + safe(a.id) + '</span><span>' + safe(b.id) + '</span></div>' +
-      rows.map(row => '<div class="plot-grid plot-row' + (state[by] === row.key ? ' is-selected' : '') + '">' +
-        '<span class="group-name">' + safe(row.label) + '</span>' + drawTrack(rate(row.a),rate(row.b),scale) +
-        '<span class="sr-only">Patch ' + safe(a.id) + '</span>' + numericCell(row.a) +
-        '<span class="sr-only">Patch ' + safe(b.id) + '</span>' + numericCell(row.b) + '</div>').join("");
-    if (rows.some(row => rate(row.a) === null || rate(row.b) === null)) {
-      $("break-plot").insertAdjacentHTML("beforeend", '<p class="subtle">A dash means this group has no reported win rate.</p>');
-    }
+    $("break-rows").innerHTML = rows.join("");
+    $("break-empty").hidden = !missingRate;
   }
   function renderStandardized(a,b) {
     const box = $("standardization");
