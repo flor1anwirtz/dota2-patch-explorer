@@ -1,5 +1,5 @@
 window.LIVE_DATA = {
-  "asOfUtc": "2026-11-27T03:41:14Z",
+  "asOfUtc": "2026-11-27T03:42:25Z",
   "throughDate": "2026-11-26",
   "patches": [
     {
@@ -294,8 +294,8 @@ window.LIVE_DATA = {
         {
           "duration": "40+",
           "rank": "low",
-          "n": 416993,
-          "wins": 205312
+          "n": 416999,
+          "wins": 205316
         },
         {
           "duration": "unknown",
@@ -324,8 +324,8 @@ window.LIVE_DATA = {
         {
           "duration": "40+",
           "rank": "mid",
-          "n": 1315474,
-          "wins": 639896
+          "n": 1315477,
+          "wins": 639899
         },
         {
           "duration": "unknown",
@@ -384,7 +384,7 @@ window.LIVE_DATA = {
         {
           "duration": "40+",
           "rank": "unknown",
-          "n": 65949,
+          "n": 65950,
           "wins": 32549
         },
         {
