@@ -207,6 +207,41 @@ details[open] .chevron { transform: translateY(2px) rotate(225deg); }
   .overview-table td:last-child { white-space: normal; }
 }
 
+.break-chart-card { margin: 0 0 12px; padding: 16px 20px 4px; }
+.break-chart-card figcaption { align-items: baseline; flex-wrap: wrap; margin-bottom: 6px; }
+.half-swatch { width: 0; height: 12px; border-left: 2px dashed var(--muted); }
+.break-chart-group {
+  display: grid;
+  grid-template-columns: minmax(128px, 16%) minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+}
+.break-chart-group + .break-chart-group { border-top: 1px solid var(--soft-line); }
+.break-chart-group h4 { font-size: 14px; font-weight: 550; }
+.break-chart-group.is-selected h4 { color: var(--accent); }
+.break-chart-row {
+  display: grid;
+  grid-template-columns: 5.1rem 4.1rem minmax(0, 1fr) 4.1rem;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.break-chart-row + .break-chart-row { margin-top: 8px; }
+.break-chart-patch, .break-chart-na { color: var(--muted); }
+.break-chart-row .radiant-score { text-align: right; }
+.break-chart-na { grid-column: 2 / -1; }
+.break-chart-track { position: relative; display: flex; height: 15px; overflow: hidden; border-radius: 3px; }
+.break-chart-track::after { content: ""; position: absolute; inset: 0 auto 0 50%; border-left: 2px dashed #26303a; transform: translateX(-1px); }
+.break-chart-radiant { background: var(--radiant); }
+.break-chart-dire { flex: 1; background: var(--dire); }
+@media (max-width: 650px) {
+  .break-chart-card { padding: 14px 12px 2px; }
+  .break-chart-group { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .break-chart-row { grid-template-columns: max-content 3.6rem minmax(0, 1fr) 3.6rem; gap: 5px; font-size: 13px; }
+}
+
 .breakdown-table thead th[scope="colgroup"] { text-align: center; color: var(--text); font-size: 14px; }
 .breakdown-table thead tr + tr th { border-top: 1px solid var(--soft-line); text-align: right; }
 .breakdown-table thead th[scope="colgroup"], .breakdown-table .match-count { border-left: 1px solid var(--soft-line); }

@@ -6,9 +6,9 @@
   <meta name="theme-color" content="#11151e">
   <meta name="description" content="Daily Radiant and Dire win rates in OpenDota ranked matches from patch 7.40 onward.">
   <title>Dota 2 Patch Explorer</title>
-  <link rel="stylesheet" href="styles.css?v=fce3ffe727">
+  <link rel="stylesheet" href="styles.css?v=158de19add">
   <script src="live-data.js" defer></script>
-  <script src="app.js?v=16cecf3b45" defer></script>
+  <script src="app.js?v=a44eecdc1f" defer></script>
 </head>
 <body>
   <a href="#comparison" class="skip-link">Skip to comparison</a>
@@ -69,6 +69,13 @@
               <button id="by-rank" type="button" aria-pressed="false">By rank</button>
             </div>
           </div>
+          <figure class="card break-chart-card" aria-labelledby="break-chart-title">
+            <figcaption class="card-heading">
+              <h3 id="break-chart-title">Side win rates by duration</h3>
+              <div class="team-legend"><span><i class="swatch radiant"></i>Radiant</span><span><i class="swatch dire"></i>Dire</span><span><i class="half-swatch"></i>50%</span></div>
+            </figcaption>
+            <div id="break-chart"></div>
+          </figure>
           <div class="card overview-card">
             <table class="overview-table breakdown-table" id="break-table" aria-labelledby="breakdown-title" aria-describedby="break-scope">
               <colgroup span="1"></colgroup><colgroup span="3"></colgroup><colgroup span="3"></colgroup>

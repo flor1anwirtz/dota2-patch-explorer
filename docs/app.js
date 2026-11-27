@@ -115,6 +115,18 @@
       '<dd>' + sideGap(aRate) + ' → ' + sideGap(bRate) + ' percentage points</dd></div>' +
       '<div><dt>95% CI on change</dt><dd>' + pp(low) + ' to ' + pp(high) + ' percentage points</dd></div></dl>';
   }
+  function breakdownBar(patchLabel, radiantRate) {
+    const patch = '<span class="break-chart-patch">' + patchLabel + '</span>';
+    if (radiantRate === null) {
+      return '<div class="break-chart-row">' + patch + '<span class="break-chart-na">No win rate available</span></div>';
+    }
+    const direRate = 100 - radiantRate;
+    return '<div class="break-chart-row">' + patch +
+      '<span class="radiant-score"><span class="sr-only">Radiant </span>' + pct(radiantRate) + '</span>' +
+      '<span class="break-chart-track" aria-hidden="true"><i class="break-chart-radiant" style="width:' +
+      radiantRate + '%"></i><i class="break-chart-dire"></i></span>' +
+      '<span class="dire-score"><span class="sr-only">Dire </span>' + pct(direRate) + '</span></div>';
+  }
   function renderBreakdown(a, b) {
     const byDuration = state.by === "duration";
     const scope = byDuration ? bands.rank[state.rank] || "All ranks" : durations[state.duration];
@@ -133,12 +145,16 @@
 
     let missingRate = false;
     const rows = [];
+    const chartGroups = [];
+    $("break-chart-title").textContent = "Side win rates by " + (byDuration ? "duration" : "rank");
     for (const [key, label] of Object.entries(bands[state.by])) {
       if (byDuration && state.duration === "20plus" && key === "short") continue;
+      const bars = [];
       const cells = [a, b].map((patch, index) => {
         const group = byDuration ? pick(patch, key, state.rank) : pick(patch, state.duration, key);
         const r = rate(group);
         if (r === null) missingRate = true;
+        bars.push(breakdownBar(patchLabels[index], r));
         const patchAttr = ' data-patch="' + patchLabels[index] + '"';
         return '<td class="match-count" data-label="Matches"' + patchAttr + '>' +
           (group ? nf.format(group.n) : "—") + '</td>' +
@@ -148,10 +164,13 @@
           (r === null ? "—" : pct(100 - r)) + '</td>';
       });
       const selected = state[state.by] === key ? ' class="is-selected"' : '';
+      chartGroups.push('<div class="break-chart-group' + (state[state.by] === key ? ' is-selected' : '') +
+        '"><h4>' + safe(label) + '</h4><div>' + bars.join("") + '</div></div>');
       rows.push('<tr' + selected + ' data-first-label="' + patchLabels[0] + '" data-second-label="' +
         patchLabels[1] + '"><th scope="row">' + safe(label) + '</th>' + cells.join("") + '</tr>');
     }
     $("break-rows").innerHTML = rows.join("");
+    $("break-chart").innerHTML = chartGroups.join("");
     $("break-empty").hidden = !missingRate;
   }
   function coverageText(p) {
