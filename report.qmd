@@ -42,7 +42,7 @@ Archon–Ancient, and Divine/Immortal.
 | Radiant wins | 497,596 | 252,781 |
 | Dire wins | 441,002 | 247,219 |
 | Radiant win rate | 53.01482% | 50.55620% |
-| Radiant minus Dire (pp) | 6.02964 | 1.11240 |
+| Radiant minus Dire (percentage points) | 6.02964 | 1.11240 |
 | Within-patch p-value | 5.2062e-744 | 3.7051e-15 |
 
 The original two-proportion comparison gave p = 7.1206e-174. As a supplementary

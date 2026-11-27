@@ -87,11 +87,11 @@ select:hover { border-color: var(--accent); }
 .stack .radiant { background: linear-gradient(90deg,#4ea881,var(--radiant)); }
 .stack .dire { flex: 1; background: linear-gradient(90deg,var(--dire),#b6647e); }
 .change-card { background: linear-gradient(118deg, #242d3d, #1a2432 75%); }
-.change-value { font-size: clamp(32px, 3vw, 44px); line-height: 1.12; font-weight: 400; margin: 5px 0 10px; font-variant-numeric: tabular-nums; }
-.change-value small { font-family: inherit; font-size: 16px; font-weight: inherit; color: var(--muted); padding-left: 7px; }
+.change-value { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 7px; font-size: clamp(32px, 3vw, 44px); line-height: 1.12; font-weight: 400; margin: 5px 0 10px; font-variant-numeric: tabular-nums; }
+.change-value small { font-family: inherit; font-size: 16px; font-weight: inherit; color: var(--muted); }
 .change-context { color: var(--muted); font-size: 13px; line-height: 1.45; margin-top: 5px; }
 .change-detail { border-top: 1px solid var(--line); padding-top: 7px; display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
-.change-detail div { display:flex; align-items:baseline; justify-content:space-between; gap: 12px; }
+.change-detail div { display:flex; flex-wrap: wrap; align-items:baseline; justify-content:space-between; gap: 3px 12px; }
 .change-detail dd { text-align:right; color:var(--text); font-size: 13px; line-height: 1.35; font-variant-numeric: tabular-nums; }
 .na { color: var(--muted); font-size: 13px; line-height: 1.55; margin-top: 6px; }
 .info-note, .error-box, #error { margin-top: 11px; padding: 11px 14px; border-left: 2px solid #dac184; background: #26262b; color: #e8dbc1; font-size: 13px; line-height: 1.5; }
@@ -101,13 +101,11 @@ select:hover { border-color: var(--accent); }
 .segmented button[aria-pressed="true"] { background: #344656; color: #fff; }
 
 .subtle { margin-top: 5px; }
-#standardization { margin-top: 13px; }
+
 .disclosure summary { display: flex; gap: 12px; align-items: center; justify-content: space-between; list-style: none; cursor: pointer; padding: 16px 22px; }
 .disclosure summary::-webkit-details-marker { display:none; }
 .disclosure summary strong { display: block; font-size: 15px; font-weight: 620; }
 .disclosure summary small { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; line-height: 1.5; }
-.disclosure-end { display: flex; align-items: center; gap: 18px; }
-.disclosure-end b { color: var(--radiant); font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .chevron { display: inline-block; width: 8px; height: 8px; border: solid var(--muted); border-width: 0 1.5px 1.5px 0; transform: translateY(-2px) rotate(45deg); flex: none; margin-right: 2px; }
 details[open] .chevron { transform: translateY(2px) rotate(225deg); }
 .detail-body { margin-inline: 22px; padding: 15px 0 19px; border-top: 1px solid var(--soft-line); color: var(--muted); font-size: 13px; line-height: 1.65; }
@@ -140,18 +138,17 @@ details[open] .chevron { transform: translateY(2px) rotate(225deg); }
  .filter-controls { grid-template-columns: 1fr 1fr; gap: 12px; }
  .summary-layout { grid-template-columns: 1fr; gap: 10px; }
  .score-line strong { font-size: clamp(16px,4.2vw,25px); } .share-row:first-child { padding-right:10px; } .share-row + .share-row { padding-left:10px; }
- .change-card #change { display:grid; grid-template-columns:minmax(90px, .75fr) minmax(0, 1.4fr); column-gap:16px; } .change-value { grid-column:1; grid-row:2; margin: 4px 0 0; font-size:34px; } .change-detail { grid-column: 2; grid-row: 1 / span 2; margin-top: 4px; padding: 0 0 0 12px; border: none; border-left: 1px solid var(--line); } .change-detail div { flex-wrap: wrap; gap: 0 6px; }
+ .change-value { font-size: 34px; }
  #breakdown, #methods { margin-top: 25px; } .card-heading { gap: 8px; }
 
  .method-grid { grid-template-columns: 1fr; } .disclosure summary { padding: 14px 16px; }
- .detail-body { margin-inline:16px; } .disclosure-end { gap: 8px; } .disclosure-end b { font-size: 13px; }
+ .detail-body { margin-inline:16px; }
 }
 @media(max-width: 400px) {
  .container { width: calc(100% - 24px); }
  .main-nav a { font-size: 12px; } .main-nav { gap: 12px; }
  .share-card,.change-card { padding: 14px; }
  .breakdown-heading { flex-wrap:wrap; gap:8px; } .team-legend { gap: 8px; }
- .disclosure-end b { display: none; }
 }
 @media(max-width: 360px) {
 

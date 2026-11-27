@@ -111,9 +111,9 @@
     const high = delta + Math.hypot(100*bHigh - bRate, aRate - 100*aLow);
     $("change").innerHTML = '<p class="change-context">Patch ' + safe(a.id) + ' → Patch ' + safe(b.id) + '</p>' +
       '<div class="change-value">' + pp(delta) +
-      '<small title="percentage points">pp</small></div><dl class="change-detail"><div><dt>Side-to-side gap</dt>' +
-      '<dd>' + sideGap(aRate) + ' → ' + sideGap(bRate) + ' pp</dd></div>' +
-      '<div><dt>95% CI on change</dt><dd>' + pp(low) + ' to ' + pp(high) + ' pp</dd></div></dl>';
+      ' <small>percentage points</small></div><dl class="change-detail"><div><dt>Side-to-side gap</dt>' +
+      '<dd>' + sideGap(aRate) + ' → ' + sideGap(bRate) + ' percentage points</dd></div>' +
+      '<div><dt>95% CI on change</dt><dd>' + pp(low) + ' to ' + pp(high) + ' percentage points</dd></div></dl>';
   }
   function renderBreakdown(a, b) {
     const byDuration = state.by === "duration";
@@ -153,25 +153,6 @@
     }
     $("break-rows").innerHTML = rows.join("");
     $("break-empty").hidden = !missingRate;
-  }
-  function renderStandardized(a,b) {
-    const box = $("standardization");
-    box.hidden = true;
-    if (!window.DotaStandardize || a.id === b.id) return;
-    const rows = [a,b].flatMap(p => ["low","mid","high"].map(rank => {
-      const g = pick(p, state.duration, rank);
-      return {patch:String(p.id), rank, n:g?.n, radiantWins:g?.wins};
-    }));
-    let s;
-    try { s = window.DotaStandardize.compareRanks(rows, a.id, b.id); } catch { return; }
-    const weights = s.bands.map(g => safe(bands.rank[g.rank] || g.rank) + " " + (100*g.weight).toFixed(1) + "%").join(" · ");
-    $("std-badge").textContent = pp(s.deltaPP) + " pp";
-    $("std-body").innerHTML = '<p>Among matches with a known rank, the adjusted Radiant win rate is <strong>' +
-      pct(100*s.oldRate) + '</strong> in patch ' + safe(a.id) + ' and <strong>' + pct(100*s.newRate) +
-      '</strong> in patch ' + safe(b.id) + ', a change of <strong>' + pp(s.deltaPP) + ' pp</strong>.</p>' +
-      '<p>Both patches use the combined sample’s rank distribution. ' + weights + '.</p>' +
-      '<p>The calculation uses the selected duration range and all three known medal groups.</p>';
-    box.hidden = false;
   }
   function coverageText(p) {
     if (!p.coveredDays) return "Awaiting data";
@@ -214,7 +195,6 @@
     renderChange(a,b,ga,gb);
     renderBreakdown(a,b);
     renderCoverage(a,b);
-    renderStandardized(a,b);
     $("status").textContent = [a,b].map((p,i) => {
       const r = rate(i === 0 ? ga : gb);
       return "Patch " + p.id + ", " + (r === null ? "win rate unavailable" : "Radiant " + pct(r));
